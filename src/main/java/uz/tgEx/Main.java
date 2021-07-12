@@ -41,11 +41,17 @@ public class Main extends TelegramLongPollingBot {
         System.out.println(text);
         Long chatId = update.getMessage().getChatId();
         SendMessage sendMessage = new SendMessage();
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setResizeKeyboard(true).setSelective(true);
+        KeyboardRow keyboardRow = new KeyboardRow();
+        KeyboardButton keyboardButtonStart = new KeyboardButton();
+        keyboardRow.add(keyboardButtonStart);
+        keyboardButtonStart.setText("/start");
         if (text.toLowerCase().equals("/start")) {
             sendMessage.setChatId(chatId);
             sendMessage.setText("Valyuta turini tanlang");
             //-------
-            ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+//            ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
             replyKeyboardMarkup.setResizeKeyboard(true).setSelective(true);
             List<KeyboardRow> keyboardRowList = new ArrayList<KeyboardRow>();
             KeyboardRow keyboardRow1 = new KeyboardRow();
