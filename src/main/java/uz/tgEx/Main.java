@@ -123,7 +123,7 @@ public class Main extends TelegramLongPollingBot {
 
 //        2-usul
 //        Course[] courses = gson.fromJson(javob, Course[].class);
-//        return courses;
+//        return courses;Dilmurod Rustamov
 
     }
 }
