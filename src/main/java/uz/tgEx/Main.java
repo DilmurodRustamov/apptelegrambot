@@ -6,7 +6,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
-import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -16,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,9 +28,8 @@ import java.util.List;
 public class Main extends TelegramLongPollingBot {
     private static int status = 0;
 
-    public static void main(String[] args) throws TelegramApiRequestException {
-        ApiContextInitializer.init();
-        TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
+    public static void main(String[] args) throws TelegramApiException {
+        TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
         telegramBotsApi.registerBot(new Main());
 
     }
@@ -42,7 +41,7 @@ public class Main extends TelegramLongPollingBot {
         Long chatId = update.getMessage().getChatId();
         SendMessage sendMessage = new SendMessage();
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-        replyKeyboardMarkup.setResizeKeyboard(true).setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
         KeyboardRow keyboardRow = new KeyboardRow();
         KeyboardButton keyboardButtonStart = new KeyboardButton();
         keyboardRow.add(keyboardButtonStart);
@@ -50,9 +49,9 @@ public class Main extends TelegramLongPollingBot {
         if (text.toLowerCase().equals("/start")) {
             sendMessage.setChatId(chatId);
             sendMessage.setText("Valyuta turini tanlang");
-            //-------
+
 //            ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-            replyKeyboardMarkup.setResizeKeyboard(true).setSelective(true);
+            replyKeyboardMarkup.setResizeKeyboard(true);
             List<KeyboardRow> keyboardRowList = new ArrayList<KeyboardRow>();
             KeyboardRow keyboardRow1 = new KeyboardRow();
             KeyboardButton keyboardButtonDollar = new KeyboardButton();
@@ -66,7 +65,7 @@ public class Main extends TelegramLongPollingBot {
             sendMessage.setReplyMarkup(replyKeyboardMarkup);
 
 
-            //----------------
+
 
         } else if (text.toLowerCase().equals("dollar ==> so'm")) {
             sendMessage.setChatId(chatId);
@@ -77,7 +76,7 @@ public class Main extends TelegramLongPollingBot {
             double amount = Double.parseDouble(text);
             sendMessage.setChatId(chatId);
             double dollar = amount * Double.parseDouble(course[0].getRate());
-            sendMessage.setText(String.valueOf(amount + "$ ==> " + dollar + " UZS ga teng"));
+            sendMessage.setText((amount + "$ ==> " + String.format("%.2f",dollar) + " UZS ga teng"));
         } else if (text.toLowerCase().equals("so'm ==> dollar")) {
             sendMessage.setChatId(chatId);
             sendMessage.setText("Qiymatni kiriting");
@@ -87,7 +86,7 @@ public class Main extends TelegramLongPollingBot {
             double amount2 = Double.parseDouble(text);
             sendMessage.setChatId(chatId);
             double som = (amount2 / Double.parseDouble(course[0].getRate()));
-            sendMessage.setText(String.valueOf(amount2 + " SO'M ==> " + som + " Dollar ga teng"));
+            sendMessage.setText((amount2 + " SO'M ==> " + String.format("%.2f",som) + " Dollar ga teng"));
         }
         try {
             execute(sendMessage);
@@ -112,18 +111,14 @@ public class Main extends TelegramLongPollingBot {
         InputStream inputStream = response.getEntity().getContent();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line = reader.readLine();
-        String javob = "";
+        StringBuilder javob = new StringBuilder();
         while (line != null) {
-            javob += line;
+            javob.append(line);
             line = reader.readLine();
         }
 
         Gson gson = new Gson();
-        return gson.fromJson(javob, Course[].class);
-
-//        2-usul
-//        Course[] courses = gson.fromJson(javob, Course[].class);
-//        return courses;Dilmurod Rustamov
+        return gson.fromJson(javob.toString(), Course[].class);
 
     }
 }
